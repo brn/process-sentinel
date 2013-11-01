@@ -95,7 +95,7 @@ function timeoutHandler(stack) {
  * @constructor
  */
 function ProcessSentinel() {
-  this._events = new EventEmitter({delimiter : '::'});
+  this._events = new EventEmitter({delimiter : '::', wildcard : true});
   this._promises = new MultiMap();
   this._domain = domain.create();
   this._firedMap = {};
@@ -204,6 +204,21 @@ ProcessSentinel.prototype.unobserveAny = function(fn) {
 
 
 /**
+ * @param {string} name
+ * @param {boolean=} opt_preventDefault
+ * @returns {Promise.Promise}
+ */
+ProcessSentinel.prototype.emit = function(name, opt_preventDefault) {
+  if (name === 'any') {
+    this._events.emitAny(name, opt_preventDefault);
+  } else {
+    this._events.emit(name, opt_preventDefault);
+  }
+  return Promise.all(this._promises.get(name).concat(this._promises.get('any')));
+};
+
+
+/**
  * @private
  * @param {string} name
  * @param {Function} fn
@@ -215,11 +230,14 @@ ProcessSentinel.prototype._addEventHandler = function(name, fn, opt_context) {
   var stack = new Error().stack;
   var fired = false;
   this._promises.get(name).push(promise);
-  var handler = function(name) {
+  var handler = function(name, opt_preventDefault) {
         defer.timeout(this._timeout).then(null, timeoutHandler.bind(null, stack));
         if (!fired) {
           fired = true;
           var event = new Event(name);
+          if (opt_preventDefault) {
+            event.preventDefault();
+          }
           fn.call(opt_context, event, function(err) {
             if (err) {
               defer.reject(err, event);
