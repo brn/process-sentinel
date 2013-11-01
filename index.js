@@ -209,11 +209,7 @@ ProcessSentinel.prototype.unobserveAny = function(fn) {
  * @returns {Promise.Promise}
  */
 ProcessSentinel.prototype.emit = function(name, opt_preventDefault) {
-  if (name === 'any') {
-    this._events.emitAny(name, opt_preventDefault);
-  } else {
-    this._events.emit(name, opt_preventDefault);
-  }
+  this._events.emit(name, opt_preventDefault);
   return Promise.all(this._promises.get(name).concat(this._promises.get('any')));
 };
 
