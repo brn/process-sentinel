@@ -1,0 +1,19 @@
+{
+  "author": "Taketoshi Aono(brn) <dobaw20@gmail.com>",
+  "description": "Controll the process halting callbacks.",
+  "repository": {
+    "url": "git@github.com:brn/process-sentinel.git"
+  },
+  "name": "process-sentinel",
+  "version": "0.1.0",
+  "private": false,
+  "engines": {
+    "node": "*"
+  },
+  "dependencies" : {
+    "node-promise" : "*",
+    "node-singleton-getter" : "*",
+    "collections" : "*",
+    "eventemitter2" : "*"
+  }
+}
